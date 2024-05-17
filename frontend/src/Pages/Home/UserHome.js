@@ -138,7 +138,7 @@ const UserHome = () => {
     const token = JSON.parse(localStorage.getItem("token"));
 
     const { data } = await axios.post(
-      "http://localhost:3000/api/v1/addTransaction",
+      addTransaction,
       formData,
       {
         headers: { Authorization: `Bearer ${token}` },
