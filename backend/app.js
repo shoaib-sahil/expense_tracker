@@ -13,7 +13,8 @@ const app = express();
 const port = process.env.PORT;
 
 await connectDB();
-app.use(cors({ origin: "http://localhost:3001" }));
+app.use(cors());
+app.options("*", cors());
 
 // const allowedOrigins = [
 //   // add more origins as needed
@@ -27,13 +28,16 @@ app.use(express.static("public"));
 
 app.use(
   cors({
-    "Access-Control-Allow-Origin": "http://localhost:3001",
+    "Access-Control-Allow-Origin": "http://localhost:3000",
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE"],
   })
 );
 
+
+
 app.use(helmet());
+
 app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
 
 app.use(morgan("dev"));
