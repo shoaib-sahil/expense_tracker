@@ -149,7 +149,7 @@ const TableData = (props) => {
                 <td style={{cursor: "pointer"}}>
                   <img id="full"
                     style={{ width: "50px" }}
-                    src={`http://localhost:4000/${item.image}`}
+                    src={`http://64.23.153.14:4000/${item.image}`}
                     onClick={toggleFullScreen}
                   />
                 </td>
