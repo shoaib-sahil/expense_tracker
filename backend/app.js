@@ -17,9 +17,10 @@ app.use(cors());
 app.options("*", cors());
 
 // const allowedOrigins = [
-//   // add more origins as needed
-//   "http://localhost:3000"
+  // add more origins as needed
+  // "http://localhost:3000"
 // ];
+
 
 // Middleware
 app.use(express.json());

@@ -1,6 +1,6 @@
 import express from 'express';
- import multer from "multer";
- import {verifyUser} from "../controllers/userController.js"
+import multer from "multer";
+import { verifyUser } from "../controllers/userController.js"
 import { addTransactionController, deleteTransactionController, getAllTransactionController, updateTransactionController } from '../controllers/transactionController.js';
 const upload = multer({ dest: 'uploads/' })
 const router = express.Router();
