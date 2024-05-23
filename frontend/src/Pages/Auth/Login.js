@@ -5,10 +5,12 @@ import Particles from "react-tsparticles";
 import { loadFull } from "tsparticles";
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import { Link, useNavigate } from "react-router-dom";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
-import { loginAPI } from "../../utils/ApiRequest";
+import { loginAPI, verifyEmailAPI } from "../../utils/ApiRequest";
+import { Eye, EyeSlashFill } from "react-bootstrap-icons";
+import InputGroup from "react-bootstrap/InputGroup";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -20,6 +22,32 @@ const Login = () => {
       navigate("/");
     }
   }, [navigate]);
+
+  useEffect(() => {
+    (async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const emailToken = urlParams.get("token");
+
+      if (!emailToken) return;
+
+      setLoading(true);
+
+      const { data } = await axios.post(verifyEmailAPI, {
+        emailToken,
+      });
+
+      if (data.success === true) {
+        localStorage.setItem("user", JSON.stringify(data.user));
+        localStorage.setItem("token", JSON.stringify(data.token));
+        navigate("/setAvatar");
+        toast.success(data.message, toastOptions);
+        setLoading(false);
+      } else {
+        toast.error(data.message, toastOptions);
+        setLoading(false);
+      }
+    })();
+  }, []);
 
   const [values, setValues] = useState({
     email: "",
@@ -74,9 +102,11 @@ const Login = () => {
     // await console.log(container);
   }, []);
 
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+
   return (
     <div style={{ position: "relative", overflow: "hidden" }}>
-      <Particles
+      {/* <Particles
         id="tsparticles"
         init={particlesInit}
         loaded={particlesLoaded}
@@ -89,7 +119,8 @@ const Login = () => {
           fpsLimit: 60,
           particles: {
             number: {
-              value: 200,
+              // value: 200,
+              value: 0,
               density: {
                 enable: true,
                 value_area: 800,
@@ -141,7 +172,10 @@ const Login = () => {
           right: 0,
           bottom: 0,
         }}
-      />
+      /> */}
+      <div id="bgimg">
+        <img src="/bg.png" />
+      </div>
       <Container
         className="mt-5"
         style={{ position: "relative", zIndex: "2 !important" }}
@@ -149,9 +183,9 @@ const Login = () => {
         <Row>
           <Col md={{ span: 6, offset: 3 }}>
             <h1 className="text-center mt-5">
-              <AccountBalanceWalletIcon
-                sx={{ fontSize: 40, color: "white" }}
-                className="text-center"
+              <img
+                src="/logo_for_dark_background.png"
+                style={{ height: 60, color: "white", marginBottom: 20 }}
               />
             </h1>
             <h2 className="text-white text-center ">Login</h2>
@@ -169,13 +203,21 @@ const Login = () => {
 
               <Form.Group controlId="formBasicPassword" className="mt-3">
                 <Form.Label className="text-white">Password</Form.Label>
-                <Form.Control
-                  type="password"
-                  name="password"
-                  placeholder="Password"
-                  onChange={handleChange}
-                  value={values.password}
-                />
+                <InputGroup>
+                  <Form.Control
+                    type={isPasswordVisible ? "text" : "password"}
+                    name="password"
+                    placeholder="Password"
+                    value={values.password}
+                    onChange={handleChange}
+                  />
+                  <InputGroup.Text
+                    onClick={() => setIsPasswordVisible(!isPasswordVisible)}
+                    style={{ userSelect: "none", cursor: "pointer" }}
+                  >
+                    {isPasswordVisible ? <EyeSlashFill /> : <Eye />}
+                  </InputGroup.Text>
+                </InputGroup>
               </Form.Group>
               <div
                 style={{
@@ -200,9 +242,13 @@ const Login = () => {
                   {loading ? "Signin…" : "Login"}
                 </Button>
 
-                <p className="mt-3" style={{ color: "#9d9494" }}>
+                <p className="mt-3" style={{ color: "white" }}>
                   Don't Have an Account?{" "}
-                  <Link to="/register" className="text-white lnk">
+                  <Link
+                    to="/register"
+                    className="lnk"
+                    style={{ color: "#0d6efd" }}
+                  >
                     Register
                   </Link>
                 </p>
@@ -210,7 +256,6 @@ const Login = () => {
             </Form>
           </Col>
         </Row>
-        <ToastContainer />
       </Container>
     </div>
   );

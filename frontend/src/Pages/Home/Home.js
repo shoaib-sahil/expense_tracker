@@ -14,10 +14,9 @@ const Home = () => {
         const user = JSON.parse(localStorage.getItem("user"));
         // console.log(user);
         
-        if (user.isAvatarImageSet === false || user.avatarImage === "") {
-          navigate("/setAvatar");
-        }
-        
+        // if (user.isAvatarImageSet === false || user.avatarImage === "") {
+        //   navigate("/setAvatar");
+        // }
         
         setcUser(user);
       } else {

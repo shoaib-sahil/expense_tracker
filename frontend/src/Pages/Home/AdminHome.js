@@ -5,7 +5,7 @@ import { Button, Modal, Form, Container } from "react-bootstrap";
 import "./home.css";
 import { addTransaction, getTransactions } from "../../utils/ApiRequest";
 import axios from "axios";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Spinner from "../../components/Spinner";
 import TableData from "./TableData";
@@ -58,9 +58,9 @@ const AdminHome = () => {
         const user = JSON.parse(localStorage.getItem("user"));
         // console.log(user);
 
-        if (user.isAvatarImageSet === false || user.avatarImage === "") {
-          navigate("/setAvatar");
-        }
+        // if (user.isAvatarImageSet === false || user.avatarImage === "") {
+        //   navigate("/setAvatar");
+        // }
 
         setcUser(user);
         setRefresh(true);
@@ -274,34 +274,31 @@ const AdminHome = () => {
   return (
     <>
       {loading ? (
-        <>
-          <Spinner />
-        </>
+        <Spinner />
       ) : (
-        <>
-          <Container
-            style={{ position: "relative", zIndex: "2 !important" }}
-            className="mt-3"
-          >
-            <h1 className="text-white text-center">Welcome {cUser?.name}</h1>
-            <div className="filterRow">
-              <div className="text-white">
-                <Form.Group className="mb-3" controlId="formSelectFrequency">
-                  <Form.Label>Select Frequency</Form.Label>
-                  <Form.Select
-                    name="frequency"
-                    value={frequency}
-                    onChange={handleChangeFrequency}
-                  >
-                    <option value="7">Last Week</option>
-                    <option value="30">Last Month</option>
-                    <option value="365">Last Year</option>
-                    <option value="custom">Custom</option>
-                  </Form.Select>
-                </Form.Group>
-              </div>
+        <Container
+          style={{ position: "relative", zIndex: "2 !important" }}
+          className="mt-3"
+        >
+          <h1 className="text-white text-center">Welcome {cUser?.name}</h1>
+          <div className="filterRow">
+            <div className="text-white">
+              <Form.Group className="mb-3" controlId="formSelectFrequency">
+                <Form.Label>Select Frequency</Form.Label>
+                <Form.Select
+                  name="frequency"
+                  value={frequency}
+                  onChange={handleChangeFrequency}
+                >
+                  <option value="7">Last Week</option>
+                  <option value="30">Last Month</option>
+                  <option value="365">Last Year</option>
+                  <option value="custom">Custom</option>
+                </Form.Select>
+              </Form.Group>
+            </div>
 
-              {/* <div className="text-white type">
+            {/* <div className="text-white type">
                                 <Form.Group className="mb-3" controlId="formSelectFrequency">
                                     <Form.Label>Type</Form.Label>
                                     <Form.Select
@@ -316,99 +313,91 @@ const AdminHome = () => {
                                 </Form.Group>
                             </div> */}
 
-              <div className="text-white iconBtnBox">
-                <FormatListBulletedIcon
-                  sx={{ cursor: "pointer" }}
-                  onClick={handleTableClick}
-                  className={`${
-                    view === "table" ? "iconActive" : "iconDeactive"
-                  }`}
-                />
-                <BarChartIcon
-                  sx={{ cursor: "pointer" }}
-                  onClick={handleChartClick}
-                  className={`${
-                    view === "chart" ? "iconActive" : "iconDeactive"
-                  }`}
-                />
-              </div>
-            </div>
-            <br style={{ color: "white" }}></br>
-
-            {frequency === "custom" ? (
+            {transactions?.length > 0 && view === "table" && (
               <>
-                <div className="date ">
-                  <div className="form-group">
-                    <label htmlFor="startDate" className="text-white">
-                      Start Date:
-                    </label>
-                    <div>
-                      <DatePicker
-                        selected={startDate}
-                        onChange={handleStartChange}
-                        selectsStart
-                        startDate={startDate}
-                        endDate={endDate}
-                      />
-                    </div>
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="endDate" className="text-white">
-                      End Date:
-                    </label>
-                    <div>
-                      <DatePicker
-                        selected={endDate}
-                        onChange={handleEndChange}
-                        selectsEnd
-                        startDate={startDate}
-                        endDate={endDate}
-                        minDate={startDate}
-                      />
-                    </div>
+                <Button
+                  style={{ marginLeft: "20px", marginTop: "10px" }}
+                  variant="primary"
+                  onClick={() => downloadTransactions(false)}
+                >
+                  Save Transactions as Image
+                </Button>
+                <Button
+                  style={{ marginLeft: "20px", marginTop: "10px" }}
+                  variant="primary"
+                  onClick={() => downloadTransactions(true)}
+                >
+                  Save Transactions as PDF
+                </Button>
+              </>
+            )}
+
+            <div
+              className="text-white iconBtnBox"
+              style={{ marginLeft: "20px" }}
+            >
+              <FormatListBulletedIcon
+                sx={{ cursor: "pointer" }}
+                onClick={handleTableClick}
+                className={`${
+                  view === "table" ? "iconActive" : "iconDeactive"
+                }`}
+              />
+              <BarChartIcon
+                sx={{ cursor: "pointer" }}
+                onClick={handleChartClick}
+                className={`${
+                  view === "chart" ? "iconActive" : "iconDeactive"
+                }`}
+              />
+            </div>
+          </div>
+
+          <br/>
+
+          {frequency === "custom" ? (
+            <>
+              <div className="date ">
+                <div className="form-group">
+                  <div>
+                    <DatePicker
+                      selected={startDate}
+                      onChange={handleStartChange}
+                      selectsStart
+                      startDate={startDate}
+                      endDate={endDate}
+                      placeholderText="Start Date"
+                    />
                   </div>
                 </div>
-              </>
-            ) : (
-              <></>
-            )}
+                <div className="form-group">
+                  <div>
+                    <DatePicker
+                      selected={endDate}
+                      onChange={handleEndChange}
+                      selectsEnd
+                      startDate={startDate}
+                      endDate={endDate}
+                      minDate={startDate}
+                      placeholderText="End Date"
+                    />
+                  </div>
+                </div>
+                <Button variant="primary" onClick={handleReset}>
+                  Reset Filter
+                </Button>
+              </div>
+            </>
+          ) : (
+            <></>
+          )}
 
-            <div className="containerBtn">
-              <Button variant="primary" onClick={handleReset}>
-                Reset Filter
-              </Button>
-              {transactions?.length && view === "table" && (
-                <>
-                  <Button
-                    style={{ marginLeft: "20px" }}
-                    variant="primary"
-                    onClick={() => downloadTransactions(false)}
-                  >
-                    Save Transactions as Image
-                  </Button>
-                  <Button
-                    style={{ marginLeft: "20px" }}
-                    variant="primary"
-                    onClick={() => downloadTransactions(true)}
-                  >
-                    Save Transactions as PDF
-                  </Button>
-                </>
-              )}
-            </div>
-            {view === "table" ? (
-              <>
-                <TableData data={transactions} user={cUser} />
-              </>
-            ) : (
-              <>
-                <Analytics transactions={transactions} user={cUser} />
-              </>
-            )}
-
-            <ToastContainer />
-          </Container>
-        </>
+          {view === "table" ? (
+            <TableData data={transactions} user={cUser} />
+          ) : (
+            <Analytics transactions={transactions} user={cUser} />
+          )}
+        </Container>
       )}
     </>
   );

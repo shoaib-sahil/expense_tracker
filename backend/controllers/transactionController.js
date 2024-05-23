@@ -16,11 +16,7 @@ export const addTransactionController = async (req, res) => {
     } = req.body;
 
     const userId = req.user.id;
-    const image = Date.now() + "_" + req.file.originalname;
-
-    fs.rename(req.file.path, "public/" + image, (error) => {
-      if (error) throw error;
-    });
+    const image = req.file;
 
     if (
       !title ||
@@ -33,16 +29,28 @@ export const addTransactionController = async (req, res) => {
       !city ||
       !image
     ) {
-      return res.status(408).json({
+      return res.json({
         success: false,
         messages: "Please Fill all fields",
       });
     }
 
+    if (!["image/png", "image/jpeg"].includes(image.mimetype))
+      return res.json({
+        success: false,
+        messages: "Only png and jpg images are allowed",
+      });
+
+    const imageName = Date.now() + "_" + image.originalname;
+
+    fs.rename(image.path, "uploads/" + imageName, (error) => {
+      if (error) throw error;
+    });
+
     const user = await User.findById(userId);
 
     if (!user) {
-      return res.status(400).json({
+      return res.json({
         success: false,
         message: "User not found",
       });
@@ -58,19 +66,20 @@ export const addTransactionController = async (req, res) => {
       user: userId,
       transactionType: transactionType,
       city: city,
-      image: image,
+      image: imageName,
     });
 
     // user.transactions.push(newTransaction);
 
     // user.save();
 
-    return res.status(200).json({
+    return res.json({
       success: true,
       message: "Transaction Added Successfully",
     });
   } catch (err) {
-    return res.status(401).json({
+    console.log(err);
+    return res.json({
       success: false,
       messages: err.message,
     });
@@ -84,14 +93,14 @@ export const getAllTransactionController = async (req, res) => {
     const user = await User.findById(req.user.id);
 
     if (!user) {
-      return res.status(400).json({
+      return res.json({
         success: false,
         message: "User not found",
       });
     }
 
     if (user.UserType !== "admin" && userId !== req.user.id) {
-      return res.status(400).json({
+      return res.json({
         success: false,
         message: "Your dont have permission to access data of other users",
       });
@@ -124,12 +133,12 @@ export const getAllTransactionController = async (req, res) => {
 
     // console.log(transactions);
 
-    return res.status(200).json({
+    return res.json({
       success: true,
       transactions: transactions,
     });
   } catch (err) {
-    return res.status(401).json({
+    return res.json({
       success: false,
       messages: err.message,
     });
@@ -146,7 +155,7 @@ export const deleteTransactionController = async (req, res) => {
     const user = await User.findById(userId);
 
     if (!user) {
-      return res.status(400).json({
+      return res.json({
         success: false,
         message: "User not found",
       });
@@ -155,14 +164,17 @@ export const deleteTransactionController = async (req, res) => {
     const transactionElement = await Transaction.findById(transactionId);
 
     if (!transactionElement) {
-      return res.status(400).json({
+      return res.json({
         success: false,
         message: "transaction not found",
       });
     }
 
-    if (transactionElement.user.toString() !== req.user.id && req.user.UserType !== "admin") {
-      return res.status(400).json({
+    if (
+      transactionElement.user.toString() !== req.user.id &&
+      req.user.UserType !== "admin"
+    ) {
+      return res.json({
         success: false,
         message: "Your dont have permission to delete data of other users",
       });
@@ -178,12 +190,12 @@ export const deleteTransactionController = async (req, res) => {
 
     // user.save();
 
-    return res.status(200).json({
+    return res.json({
       success: true,
       message: "Transaction successfully deleted",
     });
   } catch (err) {
-    return res.status(401).json({
+    return res.json({
       success: false,
       messages: err.message,
     });
@@ -200,7 +212,7 @@ export const updateTransactionController = async (req, res) => {
     const user = await User.findById(userId);
 
     if (!user) {
-      return res.status(400).json({
+      return res.json({
         success: false,
         message: "User not found",
       });
@@ -209,14 +221,17 @@ export const updateTransactionController = async (req, res) => {
     const transactionElement = await Transaction.findById(transactionId);
 
     if (!transactionElement) {
-      return res.status(400).json({
+      return res.json({
         success: false,
         message: "transaction not found",
       });
     }
 
-    if (transactionElement.user.toString() !== req.user.id && req.user.UserType !== "admin") {
-      return res.status(400).json({
+    if (
+      transactionElement.user.toString() !== req.user.id &&
+      req.user.UserType !== "admin"
+    ) {
+      return res.json({
         success: false,
         message: "Your dont have permission to update data of other users",
       });
@@ -264,13 +279,13 @@ export const updateTransactionController = async (req, res) => {
 
     // await transactionElement.remove();
 
-    return res.status(200).json({
+    return res.json({
       success: true,
       message: `Transaction Updated Successfully`,
       transaction: transactionElement,
     });
   } catch (err) {
-    return res.status(401).json({
+    return res.json({
       success: false,
       messages: err.message,
     });

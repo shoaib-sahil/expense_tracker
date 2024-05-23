@@ -9,7 +9,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, "Name is required"],
   },
-  
+
   email: {
     type: String,
     required: [true, "Email is required"],
@@ -26,6 +26,11 @@ const userSchema = new mongoose.Schema({
   UserType: {
     type: String,
     required: [true, "User Type is required"],
+  },
+
+  isEmailVerified: {
+    type: Boolean,
+    default: false,
   },
 
   isAvatarImageSet: {
